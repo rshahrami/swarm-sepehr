@@ -1,0 +1,27 @@
+#compose file for create stack in use swarm
+version: '3.8'
+services:
+
+  nginx:
+    hostname: nginx
+    image: nginx:1.20.0-v1
+    volumes:
+      - /volume/nginx/code/:/usr/share/nginx/html/code/  # code for site
+      - /volume/nginx/conf/conf.d/:/etc/nginx/conf.d/
+      - /volume/nginx/log/:/var/log/nginx/
+
+    ports:
+      - 80:80
+      - 8876:8876
+      - 443:443
+    networks:
+      - nginx-net  
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == master-a
+
+networks:
+  nginx-net:
+    external: true
+    name: sepehr

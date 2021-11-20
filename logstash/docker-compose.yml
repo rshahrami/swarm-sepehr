@@ -1,0 +1,23 @@
+#compose file for create stack in use swarm
+version: '3.8'
+services:
+
+  logstash-from-kafka:
+    hostname: logstash-from-kafka-sepehr
+    image: logstash:1.0
+    volumes:
+      - /volume/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - /volume/logstash/data/:/usr/share/logstash/data
+
+    networks: 
+      - logstash-net
+
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave1 
+
+networks:
+  logstash-net:
+    external: true
+    name: sepehr

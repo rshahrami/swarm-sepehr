@@ -1,0 +1,172 @@
+#compose file for create stack in use swarm
+version: '3.8'
+services:
+
+##################################################
+################################################## kafka ##########################################
+##################################################
+  zookeeper:
+    image: bitnami/zookeeper:3.7.0
+    ports:
+      - "2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave1
+    volumes:
+      - zookeeper_data:/bitnami/zookeeper
+    networks:
+      - kafka-net 
+
+
+  kafka-0:
+    image: bitnami/kafka:2.8.0
+    # ports:
+      # - "9094:9092"
+      # - "9093:9093"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_BROKER_ID=0
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      
+      #########  
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INSIDE://:9092,OUTSIDE://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INSIDE://:9092,OUTSIDE://kafka-0:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE
+
+      #########
+      # - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      # - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=3
+      # - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+
+      #########
+      # # - KAFKA_CFG_OFFSETS_TOPIC_NUM_PARTITIONS=3
+      # # - KAFKA_CFG_AUTO_CREATE_TOPiCS_ENABLE=true
+      # - KAFKA_CFG_MIN_INSYNC_REPLICAS=1
+
+      #########
+      # - KAFKA_CFG_LOG_RETENTION_HOURS=1
+      # - KAFKA_CFG_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      # - KAFKA_CFG_UNCLEAN_LEADER_ELECTION_ENABLE=true
+      # - KAFKA_CFG_CONTROLLER_SHUTDOWN_ENABLE=true
+      # - KAFKA_CFG_LOG_RETENTION_BYTES=-1
+      # - KAFKA_CFG_DELETE_RETENTION_MS=500000
+      # - KAFKA_CFG_DELETE_TOPIC_ENABLE=true
+
+      #########
+      # - KAFKA_CFG_CREATE_TOPICS="logstash-kafka:1:1"
+      # KAFKA_LOG_DIRS: /kafka/kafka-logs
+
+      #########
+      - KAFKA_CFG_AUTO_LEADER_REBALANCE_ENABLE=true
+
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave1
+    volumes:
+      - kafka_0_data:/bitnami/kafka
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka-net 
+
+
+  kafka-1:
+    image: bitnami/kafka:2.8.0
+    # ports:
+    #   - "9094:9094"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_BROKER_ID=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+     
+      #########  
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INSIDE://:9092,OUTSIDE://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INSIDE://:9092,OUTSIDE://kafka-1:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE
+
+      #########
+      - KAFKA_CFG_AUTO_LEADER_REBALANCE_ENABLE=true
+      
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave2
+    volumes:
+      - kafka_1_data:/bitnami/kafka
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka-net 
+
+
+  kafka-2:
+    image: bitnami/kafka:2.8.0
+    # ports:
+    #   - "9095:9095"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_BROKER_ID=2
+      - ALLOW_PLAINTEXT_LISTENER=yes
+     
+      #########  
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INSIDE://:9092,OUTSIDE://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INSIDE://:9092,OUTSIDE://kafka-2:9093  # CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE
+
+      #########
+      - KAFKA_CFG_AUTO_LEADER_REBALANCE_ENABLE=true      
+
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave4
+    volumes:
+      - kafka_2_data:/bitnami/kafka
+    depends_on:
+      - zookeeper
+    networks:
+      - kafka-net
+    
+
+  kafdrop:
+    hostname: kafdrop
+    image: obsidiandynamics/kafdrop:3.27.0
+    ports:
+      - "9001:9000"
+    environment:
+      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+      KAFKA_BROKERCONNECT: "kafka-0:9092"
+      # JMX_PORT:
+    depends_on:
+      - "kafka-0"
+      - "kafka-1"
+      - "kafka-2"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave1
+    networks:
+      - kafka-net
+
+
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_0_data:
+    driver: local
+  kafka_1_data:
+    driver: local
+  kafka_2_data:
+    driver: local  
+
+networks:
+  sepehr-net:
+    external: true
+    name: kafka-net
