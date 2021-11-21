@@ -2,10 +2,11 @@
 
 # مقدمه
   
-برای اجرای elasticsearch، نیازمند چند دستور ابتدایی در ماشین‌ها هستیم. برای تنظیمات ssl، به پوشه ssl در همین مسیر مراجعه کنید.
+برای اجرای elasticsearch، نیازمند چند دستور ابتدایی در ماشین‌ها هستیم. برای تنظیمات ssl، به پوشه ssl در همین مسیر مراجعه کنید. 
 
--------------------------------------------------------- 
-# per_requirement
+--------------------------------------------------------
+
+# تنظیمات VM
 
 با استفاده از دستور زیر، مقدار max_map را افزایش می‌دهیم.
 
@@ -25,8 +26,12 @@ sudo swapoff -a
   
 ```
 سپس وارد مسیر /ect/fstab شده و swap رو به صورت comment قرار می‌دهیم.
---------------------------------------------------------  
-# bootstrap.memory_lock
+  
+  
+--------------------------------------------------------
+# تنظیمات elasticsearch
+در این قسمت، تنظیمات درونی مربوط به elasticsearch، بیان شده است.
+## bootstrap.memory_lock
 
 این گزینه به صورت پیش فرض در حالت false قرار دارد. در این حالت، اجرای container ها به صورت docker-compose و swarm بدون مشکل می باشد. در صورتی که این گزینه به صورت true قرار گیرد، اجرا container در هر دو صورت، به مشکل می‌انجامد. در حالتی که از دستور docker-compose استفاده می‌کنیم، برای رفع این مشکل، موارد زیر را به compose file خود اضافه می‌کنیم. توجه داریم که این موارد به صورت پیش فرض نیس در فایل اصلی شرکت elasticsearch، وجود دارد و نیازی به صورت دستی نمی‌باشد.
 
@@ -62,6 +67,13 @@ ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
   
 sudo systemctl daemon-reload
   
+sudo systemctl restart docker.service
+  
 ```
-
+ 
+ # منابع
+ در این قسمت منابع مورد استفاده برای ایجاد ssl، بیان شده است.
+ 
+- youtube(https://www.youtube.com/watch?v=Y4v1Rqopz6s)
+- github(https://github.com/linuxxstart/docker-cluster-elastic)
 </div>
