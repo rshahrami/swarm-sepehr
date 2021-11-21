@@ -1,0 +1,113 @@
+version: "3.8"
+services:
+
+  cassandra-seed:
+    image: cassandra:3.11
+    hostname: cassandra-seed
+    environment:
+      - "CASSANDRA_SEEDS=cassandra-seed,cassandra1,cassandra2"
+      - "CASSANDRA_LISTEN_ADDRESS=cassandra-seed"
+      - "CASSANDRA_RPC_ADDRESS=cassandra-seed"
+      # - "CASSANDRA_BROADCAST_ADDRESS=cassandra-seed"
+      - "CASSANDRA_CLUSTER_NAME=sepehr Cluster"
+      - "CASSANDRA_DC=se1"
+      - "CASSANDRA_RACK=rack1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+      #############################################################################################
+      - "CASSANDRA_AUTHENTICATOR=org.apache.cassandra.auth.PasswordAuthenticator"
+      - "CASSANDRA_AUTHORIZER=org.apache.cassandra.auth.CassandraAuthorizer"
+      #############################################################################################
+      - "MaxDirectMemorySize=48289M -Xms1024M -Xmx1024M"
+
+      # roles_validity_in_ms: 0    2000
+      # permissions_validity_in_ms: 0     2000
+    deploy:
+      placement:
+        constraints:
+            - node.hostname == master
+    
+    ports:
+        - "9042:9042"
+    
+    networks:
+        - sepehr-net 
+
+    volumes:
+        - "path/to/directory/data/:/var/lib/cassandra/"
+        - "path/to/directory/logs/:/var/log/cassandra/"
+  
+
+  cassandra1:
+    image: cassandra:3.11
+    hostname: cassandra1
+    environment:
+      - "CASSANDRA_SEEDS=cassandra-seed,cassandra1,cassandra2"
+      - "CASSANDRA_LISTEN_ADDRESS=cassandra1"
+      - "CASSANDRA_RPC_ADDRESS=cassandra1"
+      # - "CASSANDRA_BROADCAST_ADDRESS=cassandra-seed"
+      - "CASSANDRA_CLUSTER_NAME=sepehr Cluster"
+      - "CASSANDRA_DC=se1"
+      - "CASSANDRA_RACK=rack1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+      #############################################################################################
+      - "CASSANDRA_AUTHENTICATOR=org.apache.cassandra.auth.PasswordAuthenticator"
+      - "CASSANDRA_AUTHORIZER=org.apache.cassandra.auth.CassandraAuthorizer"
+      #############################################################################################
+      - "MaxDirectMemorySize=48289M -Xms1024M -Xmx1024M"
+
+      # roles_validity_in_ms: 0    2000
+      # permissions_validity_in_ms: 0     2000
+    deploy:
+      placement:
+        constraints:
+            - node.hostname == master-a
+
+    depends_on:
+        - cassandra-seed
+    networks:
+        - sepehr-net 
+
+    volumes:
+      - "path/to/directory/data/:/var/lib/cassandra/"
+      - "path/to/directory/logs/:/var/log/cassandra/"
+
+  cassandra2:
+    image: cassandra:3.11
+    hostname: cassandra2
+    environment:
+      - "CASSANDRA_SEEDS=cassandra-seed,cassandra1,cassandra2"
+      - "CASSANDRA_LISTEN_ADDRESS=cassandra2"
+      - "CASSANDRA_RPC_ADDRESS=cassandra2"
+      # - "CASSANDRA_BROADCAST_ADDRESS=cassandra-seed"
+      - "CASSANDRA_CLUSTER_NAME=sepehr Cluster"
+      - "CASSANDRA_DC=se1"
+      - "CASSANDRA_RACK=rack1"
+      - "CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch"
+      #############################################################################################
+      - "CASSANDRA_AUTHENTICATOR=org.apache.cassandra.auth.PasswordAuthenticator" 
+      - "CASSANDRA_AUTHORIZER=org.apache.cassandra.auth.CassandraAuthorizer" 
+      #############################################################################################
+      - "MaxDirectMemorySize=48289M -Xms1024M -Xmx1024M"
+
+      # roles_validity_in_ms: 0    2000
+      # permissions_validity_in_ms: 0     2000
+      
+    deploy:
+      placement:
+        constraints:
+            - node.hostname == slave2
+
+    depends_on:
+        - cassandra-seed
+    networks:
+        - sepehr-net 
+
+    volumes:
+        - "path/to/directory/data/:/var/lib/cassandra/"
+        - "path/to/directory/logs/:/var/log/cassandra/"
+
+
+networks:
+  sepehr-net:
+    external: true
+    name: sepehr 
