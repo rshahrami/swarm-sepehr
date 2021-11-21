@@ -1,0 +1,145 @@
+version: '3'
+
+services:
+  es01:
+    hostname: es01
+    image: elasticsearch:7.13.0-v1
+    environment:
+      - "cluster.name=sepehr"
+      - node.name=es01
+      - node.master=true
+      - node.data=false
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=false
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD 
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+
+      - "transport.publish_host=es01"
+
+      # - xpack.monitoring.collection.enabled=true
+      - xpack.license.self_generated.type=basic
+      - xpack.security.enabled=true
+      # - action.auto_create_index= true
+
+      # - xpack.security.http.ssl.enabled=true
+      # - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/es01/es01.key
+      # - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      # - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/es01/es01.crt
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/es01/es01.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/es01/es01.key
+      # - "TZ=America/Sao_Paulo"
+
+    deploy:
+      placement:
+        constraints:
+            - node.hostname == master
+
+    volumes:
+      - "path/to/directory/es01/data:/usr/share/elasticsearch/data"
+      - "path/to/directory/es01/log:/usr/share/elasticsearch/logs"
+
+    ports:
+      - 9200:9200
+
+    # healthcheck:
+    #   test: curl --cacert /usr/share/elasticsearch/config/certificates/ca/ca.crt -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
+  es02:
+    hostname: es02
+    image: elasticsearch:7.13.0-v1
+    environment:
+      - "cluster.name=sepehr"
+      - node.name=es02
+      - node.master=true
+      - node.data=true
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=false
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD 
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+
+      - "transport.publish_host=es02"
+
+      # - xpack.monitoring.collection.enabled=true
+      - xpack.license.self_generated.type=basic
+      - xpack.security.enabled=true
+      # - action.auto_create_index= true
+
+      # - xpack.security.http.ssl.enabled=true
+      # - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/es02/es02.key
+      # - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      # - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/es02/es02.crt
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/es02/es02.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/es02/es02.key
+      # - "TZ=America/Sao_Paulo"
+
+    deploy:
+      placement:
+        constraints:
+            - node.hostname == master-a
+
+    volumes:
+      - "path/to/directory/es02/data:/usr/share/elasticsearch/data"
+      - "path/to/directory/es02/log:/usr/share/elasticsearch/logs"
+
+
+
+  es03:
+    hostname: es03
+    image: elasticsearch:7.13.0-v1
+    environment:
+      - "cluster.name=sepehr"
+      - node.name=es03
+      - node.master=true
+      - node.data=true
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=false
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD 
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+
+      - "transport.publish_host=es03"
+
+      # - xpack.monitoring.collection.enabled=true
+      - xpack.license.self_generated.type=basic
+      - xpack.security.enabled=true
+      # - action.auto_create_index= true
+
+      # - xpack.security.http.ssl.enabled=true
+      # - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/es03/es03.key
+      # - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      # - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/es03/es03.crt
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/es03/es03.crt
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/es03/es03.key
+      # - "TZ=America/Sao_Paulo"
+
+    deploy:
+      placement:
+        constraints:
+            - node.hostname == slave3
+
+    volumes:
+      - "path/to/directory/es03/data:/usr/share/elasticsearch/data"
+      - "path/to/directory/es03/log:/usr/share/elasticsearch/logs"
+
+
+  # wait_until_ready:
+  #   image: elasticsearch:7.13.0-v1
+  #   command: /usr/bin/true
+  #   depends_on: {"es01": {"condition": "service_healthy"}}
