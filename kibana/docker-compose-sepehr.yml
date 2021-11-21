@@ -1,0 +1,27 @@
+#compose file for create stack in use swarm
+version: '3.8'
+services:
+
+  kibana:
+    hostname: kibana
+    image: kibana:7.5.0
+    # environment:  
+      # - "server.basePath=/elk"
+      # - "SERVER_BASEPATH=/"
+
+    volumes:
+      - path/to/directory/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+    networks:
+      - sepehr-net  
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == master-a
+           
+
+networks:
+  sepehr-net:
+    external: true
+    name: sepehr
