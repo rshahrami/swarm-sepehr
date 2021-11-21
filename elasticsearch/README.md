@@ -2,7 +2,7 @@
 
 # مقدمه
   
-برای اجرای elasticsearch، نیازمند چند دستور ابتدایی در ماشین‌ها هستیم. برای تنظیمات ssl، به پوشه ssl در همین مسیر مراجعه کنید.
+برای اجرای elasticsearch، نیازمند چند دستور ابتدایی در ماشین‌ها هستیم. برای تنظیمات ssl، به پوشه ssl در همین مسیر مراجعه کنید. 
 
 -------------------------------------------------------- 
 # per_requirement
@@ -25,6 +25,8 @@ sudo swapoff -a
   
 ```
 سپس وارد مسیر /ect/fstab شده و swap رو به صورت comment قرار می‌دهیم.
+  
+  
 --------------------------------------------------------  
 # bootstrap.memory_lock
 
@@ -65,5 +67,10 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker.service
   
 ```
-
+ 
+ # منابع
+ در این قسمت منابع مورد استفاده برای ایجاد ssl، بیان شده است.
+ 
+- youtube(https://www.youtube.com/watch?v=Y4v1Rqopz6s)
+- github(https://github.com/linuxxstart/docker-cluster-elastic)
 </div>
