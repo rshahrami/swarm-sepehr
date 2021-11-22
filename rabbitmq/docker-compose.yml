@@ -1,0 +1,37 @@
+#compose file for create stack in use swarm
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:1.0
+    volumes:
+        - path/to/directory/data/:/var/lib/rabbitmq/
+    ports:
+        - 5672:5672
+        - 15672:15672
+###############################################################  deploy  ##########################################
+    deploy:
+      # replicas: 6
+      restart_policy:
+        condition: on-failure
+
+      rollback_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause # What to do if an update fails
+        order: start-first
+
+      update_config:
+        parallelism: 2
+        delay: 5s
+        failure_action: pause # What to do if an update fails
+        order: start-first
+
+
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: 1G
+        reservations:
+          cpus: "0.1"
+          memory: 200M
+  

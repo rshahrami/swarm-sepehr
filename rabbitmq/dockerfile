@@ -1,0 +1,3 @@
+FROM rabbitmq:3.8.14-management
+
+ADD ./conf/rabbitmq.conf /etc/rabbitmq/rabbitmq.conf
