@@ -74,6 +74,6 @@ sudo systemctl restart docker.service
  # منابع
  در این قسمت منابع مورد استفاده برای ایجاد ssl، بیان شده است.
  
-- youtube(https://www.youtube.com/watch?v=Y4v1Rqopz6s)
-- github(https://github.com/linuxxstart/docker-cluster-elastic)
+- [youtube](https://www.youtube.com/watch?v=Y4v1Rqopz6s)
+- [github](https://github.com/linuxxstart/docker-cluster-elastic)
 </div>
