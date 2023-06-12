@@ -37,10 +37,10 @@ services:
     # user: "$UID:$GID"
     # networks:
     #   - net-monitor
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - node.hostname == slave4
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == master1
 
   
   prometheus:
@@ -66,10 +66,10 @@ services:
       - ./prometheus/:/etc/prometheus/
       - prometheus:/prometheus
 
-    # deploy:
-    #   placement:
-    #     constraints:
-    #       - node.hostname == slave4
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == master1
 
   
   node-exporter:
@@ -90,10 +90,10 @@ services:
     - /sys:/host/sys:ro
     - /:/rootfs:ro
 
-    # networks:
-    #   - net-monitor
-    # deploy:
-    #   mode: global
+    networks:
+      - monitoring
+    deploy:
+      mode: global
 
 
   cadvisor:
@@ -110,15 +110,16 @@ services:
     #   - .env
     # ports:
     #   - 8080:8080
-    # networks:
-    #   - net-monitor
-    # deploy:
-    #   mode: global
+    networks:
+      - monitoring
+    deploy:
+      mode: global
 
 
-# networks:
-#   net-monitor:
-#     driver: overlay
+networks:
+ monitoring:
+   external: true
+   name: monitoring
 
 volumes:
   grafana:
