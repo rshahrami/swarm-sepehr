@@ -1,0 +1,127 @@
+version: '3.7'
+services:
+  # nginx:
+  #   hostname: nginx
+  #   #container_name: nginx
+  #   image: ${REGISTRY}${NGINX}
+  #   restart: unless-stopped
+  #   # expose:
+  #   #   - 80
+  #   # networks:
+  #   #   - wordpress
+  #   ports:
+  #     - 80:80
+  #   #   - 443:443
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+
+  grafana:
+    hostname: grafana
+    image: ${REGISTRY}${GRAFANA}
+    #image: 192.168.143.34:8083/grafana/grafana:9.5.3
+    environment:
+      # - GF_INSTALL_PLUGINS="grafana-clock-panel,grafana-simple-json-datasource"
+      # - GF_SECURITY_ADMIN_USER=${ADMIN_USER}
+      # - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    # env_file:
+    #   - .env
+    volumes:
+      - grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+
+    # user: "$UID:$GID"
+    # networks:
+    #   - net-monitor
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.hostname == slave4
+
+  
+  prometheus:
+    hostname: prometheus
+    image: ${REGISTRY}${PROMETHEUS}
+    #image: 192.168.143.34:8083/prometheus/prom-prometheus:v2.44.0
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    # env_file:
+    #   - .env
+    ports:
+      - 9090:9090
+    # user: "$UID:$GID"
+    # networks:
+    #   - net-monitor
+    depends_on:
+      - cadvisor 
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus:/prometheus
+
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.hostname == slave4
+
+  
+  node-exporter:
+    hostname: node-exporter
+    image: ${REGISTRY}${NODE_EXPORTER}
+    #image: 192.168.143.34:8083/node-exporter/prom-node-exporter:v1.6.0
+    command:
+    - --path.procfs=/host/proc
+    - --path.sysfs=/host/sys
+    - --collector.filesystem.ignored-mount-points
+    - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+    # env_file:
+    #   - .env
+    # ports:
+    #   - 9100:9100
+    volumes:
+    - /proc:/host/proc:ro
+    - /sys:/host/sys:ro
+    - /:/rootfs:ro
+
+    # networks:
+    #   - net-monitor
+    # deploy:
+    #   mode: global
+
+
+  cadvisor:
+    hostname: cadvisor
+    image: ${REGISTRY}${CADVISOR}
+    #image: 192.168.143.34:8083/cadvisor/google-cadvisor:v0.33.0
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    # env_file:
+    #   - .env
+    # ports:
+    #   - 8080:8080
+    # networks:
+    #   - net-monitor
+    # deploy:
+    #   mode: global
+
+
+# networks:
+#   net-monitor:
+#     driver: overlay
+
+volumes:
+  grafana:
+    name: grafana
+  prometheus:
+    name: prometheus
