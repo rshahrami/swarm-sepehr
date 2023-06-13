@@ -1,0 +1,20 @@
+  logstash-from-kafka:
+    hostname: logstash-from-kafka-sepehr
+    image: logstash:v1
+    environment:
+      - "ES_JAVA_OPTS=-Xms2048m -Xmx2048m"
+    volumes:
+      - /volume/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - /volume/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - /volume/logstash/data/:/usr/share/logstash/data/
+      - /volume/logstash/cert/:/etc/logstash/config/certs/
+    networks:
+      - sepehr-net
+    depends_on:
+      - "kafka-0"
+      - "kafka-1"
+      - "kafka-2"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == master1

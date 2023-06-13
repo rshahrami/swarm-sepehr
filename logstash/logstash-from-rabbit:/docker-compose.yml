@@ -1,0 +1,14 @@
+  logstash-from-rabbit:
+    hostname: logstash-from-rabbit
+    image: logstash:v1
+    volumes:
+      - /volume/logstash/pipeline/:/usr/share/logstash/pipeline/
+      - /volume/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - /volume/logstash/cert/:/etc/logstash/config/certs/
+      - /volume/logstash/data/:/usr/share/logstash/data/
+    networks:
+      - sepehr-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == slave1

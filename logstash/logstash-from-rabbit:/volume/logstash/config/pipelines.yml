@@ -1,0 +1,8 @@
+- pipeline.id: uniqueuser
+  path.config: "/usr/share/logstash/pipeline/uniqueuser.conf"
+
+- pipeline.id: durvisit
+  path.config: "/usr/share/logstash/pipeline/durvisit.conf"
+
+- pipeline.id: catchup_session
+  path.config: "/usr/share/logstash/pipeline/catchup_session.conf"
