@@ -1,0 +1,4 @@
+FROM 192.168.143.34:8083/logstash/logstash:8.8.0
+
+RUN ./bin/logstash-plugin install ./plugin/logstash-output-cassandra/logstash-output-cassandra-5.0.0.gem \
+   && rm -rf /usr/share/logstash/pipeline/logstash.conf 
