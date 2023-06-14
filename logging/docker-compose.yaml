@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+  filebeat:
+    image: ${REGISTRY}${filebeat}
+    hostname: "{{.Node.Hostname}}-filebeat"
+    user: root
+    networks:
+      - elastic
+    configs:
+      - source: fb_config
+        target: /usr/share/filebeat/filebeat.yml
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-node1}
+      - KIBANA_HOST=${KIBANA_HOST:-node1}
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+    volumes:
+      - filebeat:/usr/share/filebeat/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/:ro
+      - /var/log/:/var/log/:ro
+      - /var/log/audit/:/var/log/audit/:ro
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
+    deploy:
+      mode: global
+
+
+  metricbeat:
+    image: ${REGISTRY}${metricbeat}
+    hostname: "{{.Node.Hostname}}-metricbeat"
+    user: root
+    networks:
+      - elastic
+    configs:
+      - source: mb_config
+        target: /usr/share/metricbeat/metricbeat.yml
+    environment:
+      - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST:-node1}
+      - KIBANA_HOST=${KIBANA_HOST:-node1}
+      - ELASTICSEARCH_USERNAME=${ELASTICSEARCH_USERNAME:-elastic}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD:-changeme}
+    volumes:
+      - /proc:/hostfs/proc:ro
+      - /sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro
+      - /:/hostfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - metricbeat:/usr/share/metricbeat/data
+    # disable strict permission checks
+    command: ["--strict.perms=false", "-system.hostfs=/hostfs"]
+    deploy:
+      mode: global
+
+
+networks:
+  elastic:
+    external: true
+    name: host
+
+volumes:
+  filebeat:
+  metricbeat:
+
+configs:
+  fb_config:
+    file: $PWD/volume/filebeat/filebeat.yml
+  mb_config:
+    file: $PWD/volume/metricbeat/metricbeat.yml
