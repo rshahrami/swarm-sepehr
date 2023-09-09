@@ -1,0 +1,26 @@
+---
+ZABBIX_VERSION: 6.0
+ZABBIX_DEB: zabbix-release_6.0-4+ubuntu22.04_all.deb
+# ZABBIX_REPO: "https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-4+ubuntu22.04_all.deb"
+
+
+ZABBIX_REPO: "https://repo.zabbix.com/zabbix/{{ ZABBIX_VERSION }}/ubuntu/pool/main/z/zabbix-release/{{ ZABBIX_DEB }}"
+
+hostname: zabbix
+nginx_port: 80
+
+mysql_zabbix_database: zabbix
+mysql_zabbix_user: zabbix
+mysql_zabbix_password: password
+mysql_root_password: password
+
+zabbix_hostname: zabbix
+server_address: 10.32.141.55
+server_active_address: 10.32.141.55
+zabbix_agent_deb: "https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu22.04_all.deb"
+
+# important note;
+# The default credentials for the zabbix server console are:
+# username: Admin
+# passwrod: zabbix
+# Caution: make sure you change the password after you log in.

@@ -1,0 +1,53 @@
+---
+
+- name: find postgres version
+  shell: psql --version | awk '{print $3}' | cut -d '.' -f 1
+  register: POSGRES_VERSION
+
+
+- name: check exit postgres directory
+  stat:
+    path: /etc/postgresql/{{ POSGRES_VERSION.stdout }}
+
+
+- name: show postgres version 
+  debug:
+    msg: '{{ POSGRES_VERSION.stdout }}'
+
+
+- name: Configure PostgreSQL. Set listen_addresses.
+  replace: 
+    path: /etc/postgresql/{{ POSGRES_VERSION.stdout }}/main/postgresql.conf
+    regexp: "#listen_addresses = 'localhost'" 
+    replace: "listen_addresses = '*'"
+  # notify: restart_postgres
+
+- name: Configure PostgreSQL. Set md5.
+  replace: 
+    path: /etc/postgresql/{{ POSGRES_VERSION.stdout }}/main/pg_hba.conf
+    regexp: "postgres\\s+\\Kpeer"
+    replace: "md5"
+  notify: restart_postgres
+
+- name: find postgresql POSGRES_VERSION
+  postgresql_info:
+    # db: postgres 
+    filter: version
+
+
+# # local DATABASE  USER  METHOD  [OPTIONS]
+# # host DATABASE  USER  ADDRESS  METHOD  [OPTIONS]
+# - name: Add pg_hba Rule
+#   postgresql_pg_hba:
+#     dest: /etc/postgresql/{{ POSGRES_VERSION.stdout }}/main/pg_hba.conf
+#     contype: host # host
+#     order: dus
+#     databases: "{{ item.database }}" # DATABASE
+#     users: "{{ item.users }}" # USER
+#     source: "{{ item.source }}" # ADDRESS
+#     netmask: "{{ item.netmask }}"
+#     method: "{{ item.method }}" # METHOD
+#   with_items: "{{ pg_db_list }}"
+#   notify: restart_postgres
+
+

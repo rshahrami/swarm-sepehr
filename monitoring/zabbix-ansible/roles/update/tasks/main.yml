@@ -1,0 +1,75 @@
+---
+
+- name: Distribution
+  debug: msg="{{ ansible_distribution }}"
+
+
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+- name: Upgrade ubuntu.
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: Update all packages to their latest version
+  apt:
+    name: '*'
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: Update packages to latest version.
+  apt:
+    upgrade: dist
+    force_apt_get: yes   
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+- name: install epel-release
+  yum:
+    name: epel-release
+    state: latest
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+
+- name: Check if a reboot is needed for Debian and Ubuntu boxes
+  register: reboot_required_file
+  stat: path=/var/run/reboot-required get_md5=no
+  when: ansible_distribution == "Ubuntu"
+
+
+- name: Reboot
+  reboot:
+    msg: "Reboot initiated by Ansible due to kernel updates"
+    connect_timeout: '{{ reboot_connect_timeout }}'
+    reboot_timeout: '{{ reboot_timeout }}'
+    pre_reboot_delay: '{{ reboot_pre_reboot_delay }}'
+    post_reboot_delay: '{{ reboot_post_reboot_delay }}'
+    test_command: uptime
+  when: reboot_required_file.stat.exists
+
+
+- name: Reboot
+  reboot:
+    msg: "Reboot initiated by Ansible due to kernel updates"
+    connect_timeout: '{{ reboot_connect_timeout }}'
+    reboot_timeout: '{{ reboot_timeout }}'
+    pre_reboot_delay: '{{ reboot_pre_reboot_delay }}'
+    post_reboot_delay: '{{ reboot_post_reboot_delay }}'
+    test_command: uptime
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'

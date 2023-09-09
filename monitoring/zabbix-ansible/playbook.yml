@@ -1,0 +1,13 @@
+---
+
+- hosts: server
+  remote_user: root
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - update
+    - zabbix
+    - mysql
+    - nginx
+    - settings

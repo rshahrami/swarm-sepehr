@@ -1,0 +1,6 @@
+- name: Add user
+  postgresql_user:
+    name: "{{ item.user }}"
+    password: "{{ item.password }}"
+  with_items: "{{ pg_user_list }}"
+  notify: restart_postgres

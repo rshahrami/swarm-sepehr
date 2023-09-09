@@ -1,0 +1,40 @@
+---
+
+- name: install zabbix repo
+  apt:
+    deb: "{{ ZABBIX_REPO }}"
+
+# - name: download zabbix repo
+#   get_url:
+#     url: "{{ ZABBIX_REPO }}"
+#     dest: /root/"{{ ZABBIX_DEB }}"
+
+
+# - name: install zabbix deb with dpkg
+#   dpkg_selections:
+#     name: 
+
+- name: update the repo
+  apt:
+    update_cache: yes
+
+- name: install zabbix base packages
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - zabbix-server-mysql
+    - zabbix-frontend-php 
+    - zabbix-nginx-conf
+    - zabbix-sql-scripts
+    - zabbix-agent
+
+
+# - name: remove previous zabbix config
+#   file:
+#     path: /etc/nginx/conf.d/zabbix.conf
+#     state: absent
+
+# - name: restore zabbix config
+#   template: src=zabbix_server.conf dest=/etc/zabbix/zabbix_server.conf
+#   notify: restart_zabbix_services

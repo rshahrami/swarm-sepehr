@@ -63,7 +63,7 @@ services:
     depends_on:
       - cadvisor 
     volumes:
-      - ./prometheus/:/etc/prometheus/
+      - ./prometheus-conf/compose/:/etc/prometheus/
       - prometheus:/prometheus
 
     # deploy:

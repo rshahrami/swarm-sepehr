@@ -1,0 +1,9 @@
+[all:children]
+server
+agents
+
+[server]
+test
+
+[agents]
+test

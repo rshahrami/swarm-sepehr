@@ -1,0 +1,9 @@
+---
+pg_db_list:
+      - {database: all, users: all, source: 192.168.143.30, netmask: 255.255.255.255, method: md5}
+      - {database: all, users: all, source: 192.168.143.31, netmask: 255.255.255.255, method: md5}
+      - {database: all, users: all, source: 192.168.143.32, netmask: 255.255.255.255, method: md5}
+
+
+pg_user_list:
+      - {user: postgres, password: 123!@#qwe}
